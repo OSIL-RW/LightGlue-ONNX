@@ -1,31 +1,43 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "lightglue-onnx"
 version = "2.0.0"
 description = "ONNX-compatible LightGlue: Local Feature Matching at Light Speed. Supports TensorRT, TorchDynamo"
-authors = ["Fabio Milentiansen Sim <fabio.milentiansen.sim@gmail.com>"]
-license = "Apache-2.0"
 readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+authors = [
+    { name = "Fabio Milentiansen Sim", email = "fabio.milentiansen.sim@gmail.com" }
+]
+dependencies = [
+    "matplotlib>=3.9.1",
+    "opencv-python>=4.10.0.84",
+    "typer>=0.12.3",
+    #"onnxruntime-gpu>=1.18.1",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-matplotlib = "^3.9.1"
-opencv-python = "^4.10.0.84"
-typer = "^0.12.3"
-onnxruntime-gpu = {version = "^1.18.1", source = "onnxruntime-gpu-src"}
+# In uv, development/optional groups are handled via dependency-groups
+[dependency-groups]
+export = [
+    "onnx>=1.16.1",
+    "onnxscript>=0.1.0.dev20240708",
+]
 
-[tool.poetry.group.export.dependencies]
-onnx = "^1.16.1"
-onnxscript = "^0.1.0.dev20240708"
+# --- Source Configuration (The tricky part) ---
+# uv uses tool.uv.index for extra package sources
+#[[tool.uv.index]]
+#name = "onnxruntime-gpu-src"
+#url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple"
+#explicit = true
 
-[[tool.poetry.source]]
-name = "onnxruntime-gpu-src"
-url = "https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-12/pypi/simple"
-priority = "explicit"
+# Mapping specific packages to the specific index
+[tool.uv.sources]
+#onnxruntime-gpu = { index = "onnxruntime-gpu-src" }
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
+# --- Tool Configuration (Unchanged) ---
 [tool.ruff]
 target-version = "py311"
 line-length = 120
